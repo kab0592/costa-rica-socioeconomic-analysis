@@ -1,4 +1,4 @@
-Year,Region,Province_code,Province,Canton_code,Canton,Added_value,Product_tax,GDP,Exports,Imports
+year,region,province_code,province,canton_code,canton,added_value,product_tax,gdp,exports,imports
 2019,Chorotega,5,Guanacaste,507,Abangares,91318.14,11353.53,102671.67,9484.284904,8735.31
 2019,Central,1,San Jose,112,Acosta,50354.22,3085.4,53439.62,11753.58528,7822.66
 2019,Central,2,Alajuela,201,Alajuela,3347695.6,315325.72,3663021.31,2377792.011,1997857.51
