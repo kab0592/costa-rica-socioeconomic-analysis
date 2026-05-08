@@ -2,7 +2,18 @@
 # the economical data datset. It generates cleaned CSVs to be used in 'merge_data.py'.
 
 import pandas as pd
-import numpy as np
+
+def normalize_text_columns(df, columns):
+    df[columns] = df[columns].apply(
+        lambda x: (
+            x.astype(str)
+             .str.strip()
+             .str.normalize('NFKD')
+             .str.encode('ascii', errors='ignore')
+             .str.decode('utf-8')
+        )
+    )
+    return df
 
 pop2019_info = pd.read_csv('data/raw/population2019_data_raw.csv', encoding='latin1')
 pop2019_info.columns = ['canton', 'population_2015', 'population_2019', 'growth_%']
@@ -27,6 +38,10 @@ new_canton_names = ['Sarapiqui', 'Garabito', 'Los Chiles', 'Carrillo', 'Talamanc
 
 pop2019_info['canton'] = new_canton_names
 pop2019_info['population_2019'] = pop2019_info['population_2019'].astype(int)
+
+text_columns = ['canton']
+pop2019_info = normalize_text_columns(pop2019_info, text_columns)
+
 pop2019_info.to_csv('data/cleaned/population2019_clean.csv', index=False)
 
 #########################################################################################
@@ -42,6 +57,10 @@ pop2022_info['canton'] = (pop2022_info['canton'].str.normalize('NFKD').str.encod
     'ascii', errors='ignore').str.decode('utf-8'))
 
 pop2022_info = pop2022_info.replace('Leon Cortes', 'Leon Cortes Castro')
+
+text_columns = ['canton']
+pop2022_info = normalize_text_columns(pop2022_info, text_columns)
+
 pop2022_info.to_csv('data/cleaned/population2022_clean.csv', index=False)
 
 ##########################################################################################
@@ -54,9 +73,7 @@ econ_info.columns = ['year', 'region', 'province_code', 'province', 'canton_code
 text_columns = ['region', 'province_code', 'province', 'canton_code', 'canton']
 num_columns = ['year', 'added_value', 'product_tax', 'gdp', 'exports', 'imports']
 
-econ_info[text_columns] = econ_info[text_columns].apply(lambda x: (x.astype(str).str.strip()
-                        .str.normalize('NFKD').str.encode('ascii',errors='ignore')
-                        .str.decode('utf-8')))
+econ_info = normalize_text_columns(econ_info, text_columns)
 
 for col in num_columns:
     econ_info[col] = (econ_info[col].astype(str).str.replace(',', '', regex=False)
