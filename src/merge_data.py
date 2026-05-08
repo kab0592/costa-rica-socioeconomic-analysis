@@ -15,8 +15,7 @@ merged_2022 = merged_2022.rename(columns={'population_2022': 'population'})
 
 socioeconomic_cr = pd.concat([merged_2019, merged_2022], ignore_index=True)
 
-metrics = {"gdp_pc": lambda df: df["gdp"] / df["population"], "exports_pc": lambda df: df["exports"] / df["population"], 
-           "imports_pc": lambda df: df["imports"] / df["population"], "trade_balance": lambda df: df["exports"] - df["imports"]}
+metrics = {"gdp_pc": lambda df: df["gdp"] / df["population"], "trade_balance": lambda df: df["exports"] - df["imports"]}
 
 for name, func in metrics.items():
     socioeconomic_cr[name] = func(socioeconomic_cr)
@@ -26,20 +25,38 @@ socioeconomic_cr.to_csv('data/processed/socioeconomic_merged_complete.csv', inde
 socioeconomic_cr_2019 = socioeconomic_cr[socioeconomic_cr['year'] == 2019]
 socioeconomic_cr_2022 = socioeconomic_cr[socioeconomic_cr['year'] == 2022]
 
-socioeconomic_analysis = socioeconomic_cr_2022.merge(socioeconomic_cr_2019[['canton','gdp', 'exports', 'imports']], on= 'canton')
-socioeconomic_analysis = socioeconomic_analysis.rename(columns={'gdp_x': 'gdp_2022', 'exports_x': 'exports_2022', 
-                                                       'imports_x': 'imports_2022', 'gdp_y': 'gdp_2019', 'exports_y': 'exports_2019', 
-                                                       'imports_y': 'imports_2019'})
+socioeconomic_analysis = socioeconomic_cr_2022.merge(socioeconomic_cr_2019[['canton','gdp', 'population', 'exports', 'imports', 'gdp_pc']],
+                                                     on= 'canton')
+socioeconomic_analysis = socioeconomic_analysis.rename(columns={'gdp_x': 'gdp', 'exports_x': 'exports', 'population_x': 'population',
+                                                       'imports_x': 'imports', 'trade_balance_x': 'trade_balance', 'gdp_pc_x': 'gdp_pc',
+                                                       'gdp_y': 'gdp_2019', 'exports_y': 'exports_2019', 'imports_y': 'imports_2019',
+                                                       'population_y': 'population_2019', 'gdp_pc_y': 'gdp_pc_2019'})
 
-metrics = {"gdp_growth": lambda df: (df["gdp_2022"] - df["gdp_2019"]) / df["gdp_2019"],
-           "exports_growth": lambda df: (df["exports_2022"] - df["gdp_2019"]) / df["gdp_2019"], 
-           "imports_growth": lambda df: (df["imports_2022"] - df["imports_2019"]) / df["imports_2019"]}
+initial_year = 2019
+final_year = 2022
+growth_periods = final_year - initial_year
+
+metrics = {"gdp_cagr": lambda df: (((df["gdp"] / df["gdp_2019"]) ** (1/growth_periods)) - 1),
+           "gdp_pc_cagr": lambda df: (((df["gdp_pc"] / df["gdp_pc_2019"]) ** (1/growth_periods)) - 1), 
+           "exports_cagr": lambda df: (((df["exports"] / df["exports_2019"]) ** (1/growth_periods)) - 1),
+           "imports_cagr": lambda df: (((df["imports"] / df["imports_2019"]) ** (1/growth_periods)) - 1),
+           "population_cagr": lambda df: (((df["population"] / df["population_2019"]) ** (1/growth_periods)) - 1)}
 
 for name, func in metrics.items():
     socioeconomic_analysis[name] = func(socioeconomic_analysis)
 
-socioeconomic_analysis["gdp_growth_cat"] = socioeconomic_analysis["gdp_growth"].apply(lambda x:
-                                                                                      "Strong" if x > 0.04 else ("Moderate" if 0.02 < x < 0.03
-                                                                                        else ("Slow" if 0 < x < 0.02 else "Recession")))
+def classify_growth(x):
+    if x < 0:
+        return "Recession"
+    elif x < 0.02:
+        return "Slow"
+    elif x < 0.04:
+        return "Moderate"
+    else:
+        return "Strong"
+
+socioeconomic_analysis["gdp_cagr_cat"] = (socioeconomic_analysis["gdp_cagr"].apply(classify_growth))
+
+socioeconomic_analysis["gdp_pc_cagr_cat"] = (socioeconomic_analysis["gdp_pc_cagr"].apply(classify_growth))
 
 socioeconomic_analysis.to_csv('data/processed/socioeconomic_merged_2022.csv', index=False)
