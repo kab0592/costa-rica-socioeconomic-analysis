@@ -2,7 +2,6 @@
 # extracting the data from them. It outputs cleaned CSVs to be used in 'merge_data.py'.
 
 import pandas as pd
-import unicodedata as uni
 
 def normalize_text_columns(df, columns):
     df[columns] = df[columns].apply(
@@ -96,9 +95,8 @@ econ_info[num_columns] = econ_info[num_columns].fillna(0)
 #Based on project objectives, only 2019 and 2022 data is required
 econ_info.drop(econ_info[econ_info['year'].isin([2020, 2021])].index, inplace=True)
 
-#Two new "cantones" were created during the 2019-2022 period. For the purpose of this exercise and to allow a 1:1 comparison between
-# 2019 and 2022 data, the information from the two new "cantones" (Monteverde and Puerto Jimenez) was included within the data of the
-#cantones that they used to be part of (Puntarenas and Golfito, respectively).
+#Two new "cantones" were created during the 2021-2022 period. Their data was aggregated with the data of the "cantones" they were
+#part of before.
 econ_info['canton'] = econ_info['canton'].replace({'Monteverde': 'Puntarenas', 'Puerto Jimenez': 'Golfito'})
 
 df_2022 = econ_info[econ_info['year'] == 2022]
