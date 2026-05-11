@@ -1,6 +1,6 @@
-# This script uses the consolidated dataset with 2019/2022 population and economic indicators. The data is transformed and filtered
-# to only include 2022 data for this specific analysis (along some key 2019 data for growth-related metrics). Feature engineering is
-# performed to add additional economic indicators. It outputs a CSV to be loaded in analytical or visualization tools.
+#This script uses the consolidated dataset with 2019/2022 population and economic indicators. The data is transformed and filtered
+#to only include 2022 data for this specific analysis (along some key 2019 data for growth-related metrics). Feature engineering is
+#performed to add additional economic indicators. It outputs a CSV to be loaded in analytical or visualization tools.
 
 import pandas as pd
 

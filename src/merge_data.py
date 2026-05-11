@@ -1,6 +1,6 @@
-# This script merges the cleaned datasets for 2019 and 2022 population, and for economic indicators. The data is transformed into a
-# consolidated dataset which combines economic indicators and population by canton, for both 2019 and 2022. It outputs a CSV to be
-# used in 'analyze_data.py'.
+#This script merges the cleaned datasets for 2019 and 2022 population, and for economic indicators. The data is transformed into a
+#consolidated dataset which combines economic indicators and population by canton, for both 2019 and 2022. It outputs a CSV to be
+#used in 'analyze_data.py'.
 
 import pandas as pd
 
